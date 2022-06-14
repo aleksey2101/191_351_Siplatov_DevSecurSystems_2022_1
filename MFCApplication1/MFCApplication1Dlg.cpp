@@ -70,6 +70,7 @@ CMFCApplication1Dlg::CMFCApplication1Dlg(CWnd* pParent /*=nullptr*/)
 void CMFCApplication1Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT1, m_EditCtrl1);
 }
 
 BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
@@ -77,6 +78,8 @@ BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CMFCApplication1Dlg::OnBnClickedButton1)
+	ON_EN_CHANGE(IDC_EDIT1, &CMFCApplication1Dlg::OnEnChangeEdit1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CMFCApplication1Dlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -185,6 +188,52 @@ void CMFCApplication1Dlg::OnBnClickedButton1()
 	} 
 
 	if (FilterSendMessage(port, buffer, strlen(buffer), recbuffer, 50, &byterec)) {
+
+	}
+	else
+	{
+		MessageBoxA(0, recbuffer, 0, 0);
+	}
+}
+
+
+void CMFCApplication1Dlg::OnEnChangeEdit1()
+{
+	// TODO:  Если это элемент управления RICHEDIT, то элемент управления не будет
+	// send this notification unless you override the CDialogEx::OnInitDialog()
+	// функция и вызов CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Добавьте код элемента управления
+}
+
+
+void CMFCApplication1Dlg::OnBnClickedButton2()
+{
+	// TODO: добавьте свой код обработчика уведомлений
+	CString str = _T("");
+	m_EditCtrl1.GetWindowTextW(str);
+	
+	//форматируем для вывода в отдельном всплывающем окне
+	CStringA strA(str); // a helper string
+	LPCSTR ptr = strA;
+	MessageBoxA(0, ptr, 0, 0);
+
+	DWORD byterec = 0;
+	char recbuffer[50] = { 0 };
+	char strPass[256];
+	strcpy_s(strPass, CStringA(str).GetString());
+
+	if (port == NULL)
+	{
+		if (FilterConnectCommunicationPort(L"\\mf", 0, NULL, 0, NULL, &port)) {
+			MessageBoxA(0, "no connection...", 0, 0);
+			//MessageBoxA(0, 0, 0, 0);
+			return;
+		}
+	}
+
+	if (FilterSendMessage(port, strPass, strlen(strPass), recbuffer, 50, &byterec)) {
 
 	}
 	else
