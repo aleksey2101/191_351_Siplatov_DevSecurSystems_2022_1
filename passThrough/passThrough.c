@@ -1,4 +1,4 @@
-/*++
+п»ї/*++
 
 Copyright (c) 1999 - 2002  Microsoft Corporation
 
@@ -21,7 +21,10 @@ Environment:
 #include <fltKernel.h>
 #include <dontuse.h>
 #include <suppress.h>
+
+#include <string.h>
 #include "aes.h"
+
 
 #pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
 
@@ -136,7 +139,7 @@ PtDoRequestOperationStatus(
 //  operation registration
 //
 
-CONST FLT_OPERATION_REGISTRATION Callbacks[] = { // Содержит структуру данных системных событий
+CONST FLT_OPERATION_REGISTRATION Callbacks[] = { // РЎРѕРґРµСЂР¶РёС‚ СЃС‚СЂСѓРєС‚СѓСЂСѓ РґР°РЅРЅС‹С… СЃРёСЃС‚РµРјРЅС‹С… СЃРѕР±С‹С‚РёР№
     /*{IRP_MJ_CREATE,
       0,
       PtPreOperationPassThrough,
@@ -532,10 +535,81 @@ VOID MiniDisconnect(PVOID connectioncookie)
     FltCloseClientPort(gFilterHandle, &ClientPort);
 }
 
+//UNICODE_STRING global_required_extension; 
+
+//DbgPrint(("global_file_extensions"));
+//DbgPrint(global_file_extensions);
+//wchar_t buff[1024] = { 0 };//РјР°СЃСЃРёРІ СЃС‚СЂРѕРє, РЅСѓР¶РЅРѕ СЃС‚СЂРѕРєСѓ
+UNICODE_STRING global_required_extension = RTL_CONSTANT_STRING(L"tohsyrov");
+wchar_t global_file_extensions[64];
+
+
 NTSTATUS MiniSendRec(PVOID portcookie, PVOID InputBuffer, ULONG InputBufferLength, PVOID OutputBuffer, ULONG OutputBufferLength, PULONG RetLenth)
 {
-    PCHAR msg = "kernel msg";
+    PCHAR msg = "extension changed successfully";//"kernel msg"
     DbgPrint(("user msg is : %s \r\n"), (PCHAR)InputBuffer);
+    DbgPrint(InputBuffer);
+
+//    //if ((PCHAR)InputBuffer != NULL) {
+//        //global_extension_str
+////        WCHAR* wbuffer = InputBuffer;
+//        //strcpy_s(global_extension_str, CStringA(str).GetString());
+//        //PCWSTR t;
+    //wchar_t* x = (wchar_t*)InputBuffer;
+    //UNICODE_STRING local_str = RTL_CONSTANT_STRING(L"siplatov");
+
+//RtlCopyUnicodeString(&global_required_extension, &local_str);
+//        //TODO global str
+//        //check unicode, unicode const,
+//        //check str РІРјРµСЃС‚Рµ unicode
+//
+//        //RtlInitAnsiString(&AnsiString, SourceString);
+
+//       РјРµС‚РѕРґ РєРѕРїРёСЂРѕРІР°РЅРёРµ - РїРѕРїСЂРѕР±СѓРµРј РµС‰С‘ СЂР°Р·
+        //RtlAnsiStringToUnicodeString(&global_required_extension, InputBuffer, TRUE);
+
+//
+//        DbgPrint("global_required_extension");
+//        //DbgPrint((PCHAR)global_required_extension);
+//        DbgPrint(("Unicode string: %wZ\n", &global_required_extension));
+//
+//    //}
+
+    wchar_t wbuffer[64];// = (wchar_t*)InputBuffer;
+    DbgPrint(("inp"));
+    DbgPrint((wchar_t*)InputBuffer);
+
+    //dont work
+    /*wchar_t* wbuffer2 = (wchar_t)InputBuffer;
+    DbgPrint(("wbuffer2"));
+    DbgPrint(wbuffer2);*/
+
+
+    //PCSZ wbuffer = InputBuffer;
+
+
+    ////strcpy_s(global_extension_str, CStringA(str).GetString());
+    ////PCWSTR t;
+
+    //crash
+    //global_file_extensions = wbuffer;
+    //crash
+    //global_file_extensions = (wchar_t*)InputBuffer;
+    //wcscpy_s(global_file_extensions, 1024, wbuffer);
+    //memcpy(/*(void*)*/global_file_extensions, /*(void*)*/ InputBuffer, 64);
+    //memcpy((void*) global_file_extensions, (void*)InputBuffer, 64);
+
+    //try to local copy
+    memcpy(/*(void*)*/wbuffer, /*(void*)*/ InputBuffer, 64);
+
+    DbgPrint(("wbuffer"));
+    DbgPrint(wbuffer); 
+
+    memcpy(/*(void*)*/global_file_extensions, /*(void*)*/ InputBuffer, 64);
+
+    DbgPrint(("global_file_extensions"));
+    DbgPrint(global_file_extensions);
+
 
     strcpy((PCHAR)OutputBuffer, msg);
     return STATUS_SUCCESS;
@@ -622,7 +696,7 @@ Return Value:
             }
             FltCloseCommunicationPort(port);
         }
-        FltUnregisterFilter(gFilterHandle);//отменяем регистрацию фильтра в случае "неудачной регистрации"
+        FltUnregisterFilter(gFilterHandle);//РѕС‚РјРµРЅСЏРµРј СЂРµРіРёСЃС‚СЂР°С†РёСЋ С„РёР»СЊС‚СЂР° РІ СЃР»СѓС‡Р°Рµ "РЅРµСѓРґР°С‡РЅРѕР№ СЂРµРіРёСЃС‚СЂР°С†РёРё"
     }
 
     return status;
@@ -734,7 +808,7 @@ Return Value:
     }
 
 
-    //DbgPrint("Driver-Filter, filename %wZ ", Data->Iopb->TargetFileObject->FileName.Buffer); //  Вывод имени файла (FileName в UNICODE_STRING)
+    //DbgPrint("Driver-Filter, filename %wZ ", Data->Iopb->TargetFileObject->FileName.Buffer); //  Р’С‹РІРѕРґ РёРјРµРЅРё С„Р°Р№Р»Р° (FileName РІ UNICODE_STRING)
     PFLT_FILE_NAME_INFORMATION NameInfo = NULL;
     status = FltGetFileNameInformation(
         Data, 
@@ -742,23 +816,23 @@ Return Value:
         FLT_FILE_NAME_QUERY_DEFAULT, 
         &NameInfo);
 
-    //UNICODE_STRING RecuiredFileExtension = RTL_CONSTANT_STRING(L"testlabextension"); // Перевод расширения в UNICODE_STRING
+    //UNICODE_STRING RecuiredFileExtension = RTL_CONSTANT_STRING(L"testlabextension"); // РџРµСЂРµРІРѕРґ СЂР°СЃС€РёСЂРµРЅРёСЏ РІ UNICODE_STRING
 
     if (!NT_SUCCESS(status)) {
 
-        // Ничего не выводим, чтобы не загружать оперативную память, DebugView
+        // РќРёС‡РµРіРѕ РЅРµ РІС‹РІРѕРґРёРј, С‡С‚РѕР±С‹ РЅРµ Р·Р°РіСЂСѓР¶Р°С‚СЊ РѕРїРµСЂР°С‚РёРІРЅСѓСЋ РїР°РјСЏС‚СЊ, DebugView
         //DbgPrint("[-] PassThrough, FltGetFileNameInformation failed, FileName = %wZ\n", 
         //    Data->Iopb->TargetFileObject->FileName);
     }
 
-    //status =  (NameInfo); // Лог слишком большой, загружает ВМ
+    //status =  (NameInfo); // Р›РѕРі СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№, Р·Р°РіСЂСѓР¶Р°РµС‚ Р’Рњ
     //if (!NT_SUCCESS(status)) {
 
     //    DbgPrint("[-] PassThrough, FltParseFileNameInformation failed, FileName = %wZ\n", 
     //        Data->Iopb->TargetFileObject->FileName);
     //}
 
-    /*else if ( // Проверка на совпадение расширения с нашим шаблоном
+    /*else if ( // РџСЂРѕРІРµСЂРєР° РЅР° СЃРѕРІРїР°РґРµРЅРёРµ СЂР°СЃС€РёСЂРµРЅРёСЏ СЃ РЅР°С€РёРј С€Р°Р±Р»РѕРЅРѕРј
         RtlEqualUnicodeString(
             &RecuiredFileExtension,
             &NameInfo->Extension, \
@@ -814,7 +888,7 @@ Return Value:
         //((char*)Data->Iopb->Parameters.Write.WriteBuffer)[0] = '*';
         
 
-        // Так как IRP-коды у Read и Write буфферов одинаковые, можем не писать следующее:
+        // РўР°Рє РєР°Рє IRP-РєРѕРґС‹ Сѓ Read Рё Write Р±СѓС„С„РµСЂРѕРІ РѕРґРёРЅР°РєРѕРІС‹Рµ, РјРѕР¶РµРј РЅРµ РїРёСЃР°С‚СЊ СЃР»РµРґСѓСЋС‰РµРµ:
         //DbgPrint("ReadBuffer = %s\n", (char*)Data->Iopb->Parameters.Read.ReadBuffer);
         //((char*)Data->Iopb->Parameters.Read.ReadBuffer)[0] = '&';
     }*/
@@ -880,6 +954,7 @@ Return Value:
 }
 
 
+int global_file_extensions_flag = 0;
 FLT_POSTOP_CALLBACK_STATUS
 PtPostOperationPassThrough(
     _Inout_ PFLT_CALLBACK_DATA Data,
@@ -895,10 +970,10 @@ Routine Description:
     miniFilter.
 
     This is non-pageable because it may be called at DPC level.
-    Эта процедура является процедурой завершения после операции для этого
-    мини-фильтра.
+    Р­С‚Р° РїСЂРѕС†РµРґСѓСЂР° СЏРІР»СЏРµС‚СЃСЏ РїСЂРѕС†РµРґСѓСЂРѕР№ Р·Р°РІРµСЂС€РµРЅРёСЏ РїРѕСЃР»Рµ РѕРїРµСЂР°С†РёРё РґР»СЏ СЌС‚РѕРіРѕ
+    РјРёРЅРё-С„РёР»СЊС‚СЂР°.
 
-    Это не доступно для просмотра по страницам, поскольку оно может быть вызвано на уровне DPC.
+    Р­С‚Рѕ РЅРµ РґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° РїРѕ СЃС‚СЂР°РЅРёС†Р°Рј, РїРѕСЃРєРѕР»СЊРєСѓ РѕРЅРѕ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІС‹Р·РІР°РЅРѕ РЅР° СѓСЂРѕРІРЅРµ DPC.
 
 Arguments:
 
@@ -912,15 +987,15 @@ Arguments:
 
     Flags - Denotes whether the completion is successful or is being drained.
 
-    Данные - Указатель на данные обратного вызова фильтра, которые передаются нам.
+    Р”Р°РЅРЅС‹Рµ - РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РґР°РЅРЅС‹Рµ РѕР±СЂР°С‚РЅРѕРіРѕ РІС‹Р·РѕРІР° С„РёР»СЊС‚СЂР°, РєРѕС‚РѕСЂС‹Рµ РїРµСЂРµРґР°СЋС‚СЃСЏ РЅР°Рј.
 
-    FltObjects - Указатель на структуру данных FLT_RELATED_OBJECTS, содержащую
-        непрозрачные дескрипторы для этого фильтра, экземпляра, связанного с ним тома и
-файлового объекта.
+    FltObjects - РЈРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂСѓРєС‚СѓСЂСѓ РґР°РЅРЅС‹С… FLT_RELATED_OBJECTS, СЃРѕРґРµСЂР¶Р°С‰СѓСЋ
+        РЅРµРїСЂРѕР·СЂР°С‡РЅС‹Рµ РґРµСЃРєСЂРёРїС‚РѕСЂС‹ РґР»СЏ СЌС‚РѕРіРѕ С„РёР»СЊС‚СЂР°, СЌРєР·РµРјРїР»СЏСЂР°, СЃРІСЏР·Р°РЅРЅРѕРіРѕ СЃ РЅРёРј С‚РѕРјР° Рё
+С„Р°Р№Р»РѕРІРѕРіРѕ РѕР±СЉРµРєС‚Р°.
 
-    CompletionContext - Контекст завершения, установленный в процедуре предварительной операции.
+    CompletionContext - РљРѕРЅС‚РµРєСЃС‚ Р·Р°РІРµСЂС€РµРЅРёСЏ, СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅС‹Р№ РІ РїСЂРѕС†РµРґСѓСЂРµ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕР№ РѕРїРµСЂР°С†РёРё.
 
-    Флаги - Указывает, является ли завершение успешным или происходит слив.
+    Р¤Р»Р°РіРё - РЈРєР°Р·С‹РІР°РµС‚, СЏРІР»СЏРµС‚СЃСЏ Р»Рё Р·Р°РІРµСЂС€РµРЅРёРµ СѓСЃРїРµС€РЅС‹Рј РёР»Рё РїСЂРѕРёСЃС…РѕРґРёС‚ СЃР»РёРІ.
 
 Return Value:
 
@@ -936,106 +1011,132 @@ Return Value:
     PT_DBG_PRINT(PTDBG_TRACE_ROUTINES,
         ("PassThrough!PtPostOperationPassThrough: Entered\n"));
 
-    // Начало
+    // РќР°С‡Р°Р»Рѕ
     NTSTATUS status;
-    PFLT_FILE_NAME_INFORMATION NameInfo = NULL; // Объявление структуры
+    PFLT_FILE_NAME_INFORMATION NameInfo = NULL; // РћР±СЉСЏРІР»РµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹
     status = FltGetFileNameInformation(
         Data,
         FLT_FILE_NAME_NORMALIZED |
         FLT_FILE_NAME_QUERY_DEFAULT,
-        &NameInfo); // Парсинг имени файла на составляющие
+        &NameInfo); // РџР°СЂСЃРёРЅРі РёРјРµРЅРё С„Р°Р№Р»Р° РЅР° СЃРѕСЃС‚Р°РІР»СЏСЋС‰РёРµ
+    UNICODE_STRING required_extension = RTL_CONSTANT_STRING(L"tohsyrov"); // РџРµСЂРµРІРѕРґ СЂР°СЃС€РёСЂРµРЅРёСЏ РІ UNICODE_STRING
+    //PCHAR required_extension = "tohsyrov"; // РџРµСЂРµРІРѕРґ СЂР°СЃС€РёСЂРµРЅРёСЏ РІ UNICODE_STRING
 
-    UNICODE_STRING required_extension = RTL_CONSTANT_STRING(L"tohsyrov"); // Перевод расширения в UNICODE_STRING
 
     if (!NT_SUCCESS(status)) {
-        //ничего не выводим, чтобы не загружать оперативную память, DebugView
+        //РЅРёС‡РµРіРѕ РЅРµ РІС‹РІРѕРґРёРј, С‡С‚РѕР±С‹ РЅРµ Р·Р°РіСЂСѓР¶Р°С‚СЊ РѕРїРµСЂР°С‚РёРІРЅСѓСЋ РїР°РјСЏС‚СЊ, DebugView
     }
-    else if ( // проверка на совпадение расширения с нашим шаблоном
-        RtlEqualUnicodeString(
-            &required_extension,
-            &NameInfo->Extension, \
-            FALSE)) {
-        //проверка на событие IRP_MJ_WRITE
-        if (Data->Iopb->MajorFunction == IRP_MJ_WRITE) {
-            DbgPrint("_____");
-            DbgPrint("Writing");//индикатор, что обнаружен перехват события "запись"
-            DbgPrint("Data:");
-            DbgPrint(Data->Iopb->Parameters.Write.WriteBuffer);//вывод в консоль данных перехваченного буфера
+    else if ( // РїСЂРѕРІРµСЂРєР° РЅР° СЃРѕРІРїР°РґРµРЅРёРµ СЂР°СЃС€РёСЂРµРЅРёСЏ СЃ РЅР°С€РёРј С€Р°Р±Р»РѕРЅРѕРј
+        //RtlEqualUnicodeString(
+        //&required_extension,
+        ////&global_required_extension,
+        //&NameInfo->Extension, 
+        //FALSE)
+        
+        (/*(global_file_extensions_flag != 0) && */((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions) != NULL) == 1)
+        ) 
+         {
+            DbgPrint("\n");
 
-            if (Data->Iopb->Parameters.Write.WriteBuffer) {//проверяем, что в буфере что-то есть
-                //DbgPrint("Cipher");//индикатор
-                //unsigned char cipher[64];
-                uint8_t hexarray[1024];//задаем массив, в котором будет храниться буфер
-                memset(hexarray, 0, 1024);//заполнение массива hexarray нулями
-                DbgPrint("Buffer is not null...");
-                DbgPrint("Crypting...");
-                //посимвольно забираем из буфера все символы в массив
-                for (int i = 0; i < strlen(Data->Iopb->Parameters.Write.WriteBuffer); i++) {
-                    hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i];
+            DbgPrint("Extension.Buffer:");
+            DbgPrint(NameInfo->Extension.Buffer);
+            DbgPrint("Extension.Buffer2:");
+            DbgPrint(&NameInfo->Extension.Buffer);
+
+            DbgPrint("test:");
+            DbgPrint(((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions)) != NULL);
+
+            DbgPrint("global_file_extension:");
+            DbgPrint(global_file_extensions);
+
+            DbgPrint("\n");
+            DbgPrint("ext file:");
+            DbgPrint(&NameInfo->Extension);
+            //DbgPrint("ext need:");
+            //DbgPrint(("Unicode string: %wZ\n", &required_extension));
+            //DbgPrint(("Unicode string: %wZ\n", &global_required_extension));
+
+            //РїСЂРѕРІРµСЂРєР° РЅР° СЃРѕР±С‹С‚РёРµ IRP_MJ_WRITE
+            if (Data->Iopb->MajorFunction == IRP_MJ_WRITE) {
+                DbgPrint("_____");
+                DbgPrint("Writing");//РёРЅРґРёРєР°С‚РѕСЂ, С‡С‚Рѕ РѕР±РЅР°СЂСѓР¶РµРЅ РїРµСЂРµС…РІР°С‚ СЃРѕР±С‹С‚РёСЏ "Р·Р°РїРёСЃСЊ"
+                DbgPrint("Data:");
+                DbgPrint(Data->Iopb->Parameters.Write.WriteBuffer);//РІС‹РІРѕРґ РІ РєРѕРЅСЃРѕР»СЊ РґР°РЅРЅС‹С… РїРµСЂРµС…РІР°С‡РµРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°
+
+                if (Data->Iopb->Parameters.Write.WriteBuffer) {//РїСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ РІ Р±СѓС„РµСЂРµ С‡С‚Рѕ-С‚Рѕ РµСЃС‚СЊ
+                    //DbgPrint("Cipher");//РёРЅРґРёРєР°С‚РѕСЂss
+                    //unsigned char cipher[64];
+                    uint8_t hexarray[1024];//Р·Р°РґР°РµРј РјР°СЃСЃРёРІ, РІ РєРѕС‚РѕСЂРѕРј Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊСЃСЏ Р±СѓС„РµСЂ
+                    memset(hexarray, 0, 1024);//Р·Р°РїРѕР»РЅРµРЅРёРµ РјР°СЃСЃРёРІР° hexarray РЅСѓР»СЏРјРё
+                    DbgPrint("Buffer is not null...");
+                    DbgPrint("Crypting...");
+                    //РїРѕСЃРёРјРІРѕР»СЊРЅРѕ Р·Р°Р±РёСЂР°РµРј РёР· Р±СѓС„РµСЂР° РІСЃРµ СЃРёРјРІРѕР»С‹ РІ РјР°СЃСЃРёРІ
+                    for (int i = 0; i < strlen(Data->Iopb->Parameters.Write.WriteBuffer); i++) {
+                        hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i];
+                    }
+
+                    unsigned char KEY[] = "142354759ADFBCAD";//РѕРїСЂРµРґРµР»РµРЅРёРµ РєР»СЋС‡Р°
+                    uint8_t* key = (uint8_t*)KEY;//РїСЂРёРІРµРґРµРЅРёРµ РєР»СЋС‡Р° Рє РЅСѓР¶РЅРѕРјСѓ С„РѕСЂРјР°С‚Сѓ
+                    uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//РёРЅРёС†РёР°Р»РёР·РёСЂСѓСЋС‰РёР№ РІРµРєС‚РѕСЂ
+                        0x6e, 0x74, 0x65, 0x72,
+                        0x65, 0x73, 0x74, 0x69,
+                        0x6e, 0x67, 0x21, 0x21 };
+
+                    struct AES_ctx ctx;//СЃРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° С€РёС„СЂР° (РєРѕРЅС‚РµРєСЃС‚, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊ РєР»СЋС‡ Рё РёРЅРёС†РёР°Р»РёР·РёСЂСѓСЋС‰РёР№ РІРµРєС‚РѕСЂ)
+
+                    AES_init_ctx_iv(&ctx, key, iv);//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃС‚СЂСѓРєС‚СѓСЂС‹
+                    AES_CBC_encrypt_buffer(&ctx, hexarray, 1024);//С€РёС„СЂСѓРµРј Р±СѓС„РµСЂ (РїРµСЂРµРґР°РµРј РєРѕРЅС‚РµРєСЃС‚, Р±СѓС„РµСЂ Рё РґР»РёРЅСѓ Р±СѓС„РµСЂР°)
+
+                    DbgPrint("enc_hexarray");
+                    DbgPrint(hexarray);
+                    for (int i = 0; i < 1024; i++) {
+                        ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
+                    }
                 }
 
-                unsigned char KEY[] = "142354759ADFBCAD";//определение ключа
-                uint8_t* key = (uint8_t*)KEY;//приведение ключа к нужному формату
-                uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//инициализирующий вектор
-                    0x6e, 0x74, 0x65, 0x72,
-                    0x65, 0x73, 0x74, 0x69,
-                    0x6e, 0x67, 0x21, 0x21 };
-
-                struct AES_ctx ctx;//создание объекта шифра (контекст, который будет хранить ключ и инициализирующий вектор)
-
-                AES_init_ctx_iv(&ctx, key, iv);//инициализация структуры
-                AES_CBC_encrypt_buffer(&ctx, hexarray, 1024);//шифруем буфер (передаем контекст, буфер и длину буфера)
-
-                DbgPrint("enc_hexarray");
-                DbgPrint(hexarray);
-                for (int i = 0; i < 1024; i++) {
-                    ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
-                }
             }
+            //РїСЂРѕРІРµСЂРєР° РЅР° СЃРѕР±С‹С‚РёРµ IRP_MJ_READ
+            else if (Data->Iopb->MajorFunction == IRP_MJ_READ) {
+                DbgPrint("_____");
+                DbgPrint("Reading...");//РёРЅРґРёРєР°С‚РѕСЂ, С‡С‚Рѕ РѕР±РЅР°СЂСѓР¶РµРЅ РїРµСЂРµС…РІР°С‚ СЃРѕР±С‹С‚РёСЏ "read"
+                DbgPrint("Data:");
+                DbgPrint(Data->Iopb->Parameters.Read.ReadBuffer);//РІС‹РІРѕРґ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ Р±СѓС„РµСЂР°
+                //РµСЃР»Рё Р±СѓС„РµСЂ РЅРµ РїСѓСЃС‚, С‚Рѕ СЂР°СЃС€РёС„СЂРѕРІС‹РІР°РµРј РµРіРѕ
+                if (strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer) != 0) {
+                    DbgPrint("Buffer is not null...");
+                    DbgPrint("Decrypting...");//РёРЅРґРёРєР°С‚РѕСЂ
+                    //unsigned char decipher[64];
+                    uint8_t hexarray[1024];//Р·Р°РґР°РµРј РјР°СЃСЃРёРІ, РІ РєРѕС‚РѕСЂРѕРј Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊСЃСЏ Р±СѓС„РµСЂ
+                    memset(hexarray, 0, 1024);//Р·Р°РїРѕР»РЅСЏРµРј РјР°СЃСЃРёРІ РЅСѓР»СЏРјРё
+                    //Р·Р°Р±РёСЂР°РµРј РёР· Р±СѓС„РµСЂР° РІ РјР°СЃСЃРёРІ РІСЃРµ РґР°РЅРЅС‹Рµ
+                    for (int i = 0; i < strlen(Data->Iopb->Parameters.Read.ReadBuffer); i++) {
+                        hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Read.ReadBuffer)[i];
+                    }
 
-        }
-        //проверка на событие IRP_MJ_READ
-        else if (Data->Iopb->MajorFunction == IRP_MJ_READ) {
-            DbgPrint("_____");
-            DbgPrint("Reading...");//индикатор, что обнаружен перехват события "read"
-            DbgPrint("Data:");
-            DbgPrint(Data->Iopb->Parameters.Read.ReadBuffer);//вывод содержимого буфера
-            //если буфер не пуст, то расшифровываем его
-            if (strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer) != 0) {
-                DbgPrint("Buffer is not null...");
-                DbgPrint("Decrypting...");//индикатор
-                //unsigned char decipher[64];
-                uint8_t hexarray[1024];//задаем массив, в котором будет храниться буфер
-                memset(hexarray, 0, 1024);//заполняем массив нулями
-                //забираем из буфера в массив все данные
-                for (int i = 0; i < strlen(Data->Iopb->Parameters.Read.ReadBuffer); i++) {
-                    hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Read.ReadBuffer)[i];
+                    DbgPrint("Source data:");
+                    DbgPrint(hexarray);
+                    //DbgPrint(hexarray);
+
+                    unsigned char KEY[] = "142354759ADFBCAD";//РѕРїСЂРµРґРµР»РµРЅРёРµ РєР»СЋС‡Р°
+                    uint8_t* key = (uint8_t*)KEY;//РїСЂРёРІРµРґРµРЅРёРµ РєР»СЋС‡Р° Рє РЅСѓР¶РЅРѕРјСѓ С„РѕСЂРјР°С‚Сѓ
+                    uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//РёРЅРёС†РёР°Р»РёР·РёСЂСѓСЋС‰РёР№ РІРµРєС‚РѕСЂ
+                        0x6e, 0x74, 0x65, 0x72,
+                        0x65, 0x73, 0x74, 0x69,
+                        0x6e, 0x67, 0x21, 0x21 };
+
+                    struct AES_ctx ctx;//СЃРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° С€РёС„СЂР° (РєРѕРЅС‚РµРєСЃС‚, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊ РєР»СЋС‡ Рё РёРЅРёС†РёР°Р»РёР·РёСЂСѓСЋС‰РёР№ РІРµРєС‚РѕСЂ)
+
+                    AES_init_ctx_iv(&ctx, key, iv);//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃС‚СЂСѓРєС‚СѓСЂС‹
+                    AES_CBC_decrypt_buffer(&ctx, hexarray, 1024);//СЂР°СЃС€РёС„СЂСѓРµРј Р±СѓС„РµСЂ (РїРµСЂРµРґР°РµРј РєРѕРЅС‚РµРєСЃС‚, Р±СѓС„РµСЂ Рё РґР»РёРЅСѓ Р±СѓС„РµСЂР°)
+                    DbgPrint("Result:");
+                    DbgPrint(hexarray);//РІС‹РІРѕРґ РјР°СЃСЃРёРІР° СЃРёРјРІРѕР»РѕРІ
+
+                    //РїРµСЂРµРґР°РµРј РІРµСЃСЊ СЂР°СЃС€РёС„СЂРѕРІР°РЅРЅС‹Р№ С‚РµРєСЃС‚ РІ Р±СѓС„РµСЂ Р·Р°РїРёСЃРё
+                    for (int i = 0; i<strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer); i++) {
+                        ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
+                    }
                 }
-
-                DbgPrint("Source data:");
-                DbgPrint(hexarray);
-                //DbgPrint(hexarray);
-
-                unsigned char KEY[] = "142354759ADFBCAD";//определение ключа
-                uint8_t* key = (uint8_t*)KEY;//приведение ключа к нужному формату
-                uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//инициализирующий вектор
-                    0x6e, 0x74, 0x65, 0x72,
-                    0x65, 0x73, 0x74, 0x69,
-                    0x6e, 0x67, 0x21, 0x21 };
-
-                struct AES_ctx ctx;//создание объекта шифра (контекст, который будет хранить ключ и инициализирующий вектор)
-
-                AES_init_ctx_iv(&ctx, key, iv);//инициализация структуры
-                AES_CBC_decrypt_buffer(&ctx, hexarray, 1024);//расшифруем буфер (передаем контекст, буфер и длину буфера)
-                DbgPrint("Result:");
-                DbgPrint(hexarray);//вывод массива символов
-
-                //передаем весь расшифрованный текст в буфер записи
-                for (int i = 0; i<strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer); i++) {
-                    ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
-                }
-            }
-        }
+         }
     }
     return FLT_POSTOP_FINISHED_PROCESSING;
 }

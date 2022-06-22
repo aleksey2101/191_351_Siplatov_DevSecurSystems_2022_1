@@ -4,7 +4,7 @@
 
 int main() {
 	FILE * fptr;
-	fopen_s(&fptr, "file.tohsyrov", "r+");
+	fopen_s(&fptr, "file.siplatov", "r+");
 
 	if (fptr == 0) {
 		return -1;
