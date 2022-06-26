@@ -1085,7 +1085,7 @@ Return Value:
             DbgPrint(global_file_extensions);//tohsyrov
 
             //us 000
-            if (wcsncmp(buf, global_file_extensions, 8) == 0) //FALSE
+            if (wcscmp(buf, global_file_extensions) == 0) //FALSE
             {
                 DbgPrint("TRUE");
             }
@@ -1093,9 +1093,17 @@ Return Value:
             {
                 DbgPrint("FALSE");
             }
-            //int i = wcscmp(buf, global_file_extensions);
-            int i = wcsncmp(buf, global_file_extensions, 8);
+            int i = wcscmp(buf, global_file_extensions);
             DbgPrint("%d", i); //-28000
+            //txt exe pub siplatov
+            //ext file = sip
+            //int k = wstrstr(global_file_extensions, " "); //5
+            //добавить пробельчики по бокам и поиск подстроке
+            
+
+            //int i = wcsncmp(buf, global_file_extensions, 8);
+            //DbgPrint("%d", i); //-28000
+
 
 
             ////us 000
