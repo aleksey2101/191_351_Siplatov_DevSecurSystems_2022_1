@@ -23,6 +23,9 @@ Environment:
 #include <suppress.h>
 
 #include <string.h>
+//#include <wchar.h>
+
+#include <stdlib.h>
 #include "aes.h"
 
 
@@ -542,6 +545,7 @@ VOID MiniDisconnect(PVOID connectioncookie)
 //wchar_t buff[1024] = { 0 };//массив строк, нужно строку
 UNICODE_STRING global_required_extension = RTL_CONSTANT_STRING(L"tohsyrov");
 wchar_t global_file_extensions[64];
+//wchar_t * global_file_extensions;
 
 
 NTSTATUS MiniSendRec(PVOID portcookie, PVOID InputBuffer, ULONG InputBufferLength, PVOID OutputBuffer, ULONG OutputBufferLength, PULONG RetLenth)
@@ -605,7 +609,8 @@ NTSTATUS MiniSendRec(PVOID portcookie, PVOID InputBuffer, ULONG InputBufferLengt
     DbgPrint(("wbuffer"));
     DbgPrint(wbuffer); 
 
-    memcpy(/*(void*)*/global_file_extensions, /*(void*)*/ InputBuffer, 64);
+    //memcpy(/*(void*)*/global_file_extensions, /*(void*)*/ InputBuffer, 64);
+    mbstowcs(global_file_extensions, InputBuffer, 64);
 
     DbgPrint(("global_file_extensions"));
     DbgPrint(global_file_extensions);
@@ -1021,40 +1026,318 @@ Return Value:
         &NameInfo); // Парсинг имени файла на составляющие
     UNICODE_STRING required_extension = RTL_CONSTANT_STRING(L"tohsyrov"); // Перевод расширения в UNICODE_STRING
     //PCHAR required_extension = "tohsyrov"; // Перевод расширения в UNICODE_STRING
+    //UNICODE_STRING global_UNICODE_STRING = RTL_CONSTANT_STRING(global_file_extensions);
 
 
     if (!NT_SUCCESS(status)) {
         //ничего не выводим, чтобы не загружать оперативную память, DebugView
     }
     else if ( // проверка на совпадение расширения с нашим шаблоном
+        RtlEqualUnicodeString(
+        &required_extension,
+        //&global_required_extension,
+           // &global_UNICODE_STRING,
+        &NameInfo->Extension, 
+        FALSE)
+        //||
         //RtlEqualUnicodeString(
-        //&required_extension,
-        ////&global_required_extension,
-        //&NameInfo->Extension, 
-        //FALSE)
-        
-        (/*(global_file_extensions_flag != 0) && */((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions) != NULL) == 1)
+        //    //&required_extension,
+        //    //&global_required_extension,
+        //    &global_UNICODE_STRING,
+        //    &NameInfo->Extension,
+        //    FALSE)
+
+        //пробуем
+        //(NameInfo->Extension.Buffer == global_file_extensions)
+        //((global_file_extensions_flag != 0) && ((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions) != NULL) == 1)
         ) 
          {
-            DbgPrint("\n");
+            DbgPrint("1"); //TRUE
+            UNICODE_STRING s = global_required_extension; //TRUE
+            //UNICODE_STRING s = (UNICODE_STRING) global_file_extensions;
+            if (RtlEqualUnicodeString(
+                &s,
+                &NameInfo->Extension,
+                FALSE)) {
+                DbgPrint("TRUE");
+            }else
+            {
+                DbgPrint("FALSE");
+            }
+
+            
+
+            DbgPrint("1.1.1"); 
+            /*UNICODE_STRING us;
+            RtlInitString(&us, global_file_extensions);*/
+
+            wchar_t buf[64];
+            memset(buf, 0, sizeof(buf));
+            memcpy(buf, NameInfo->Extension.Buffer, NameInfo->Extension.Length);
+
+            //DbgPrint("us Unicode string: %wZ\n", us);//Unicode string: tohsyrov
+
+            DbgPrint("Unicode ext string: %wZ\n", NameInfo->Extension);
+            DbgPrint("buf");
+            DbgPrint(buf);//t
+
+            DbgPrint("global_file_extension:");
+            DbgPrint(global_file_extensions);//tohsyrov
+
+            //us 000
+            if (wcsncmp(buf, global_file_extensions, 8) == 0) //FALSE
+            {
+                DbgPrint("TRUE");
+            }
+            else
+            {
+                DbgPrint("FALSE");
+            }
+            //int i = wcscmp(buf, global_file_extensions);
+            int i = wcsncmp(buf, global_file_extensions, 8);
+            DbgPrint("%d", i); //-28000
+
+
+            ////us 000
+            //if (RtlEqualUnicodeString( //FALSE
+            //    &us,
+            //    &NameInfo->Extension,
+            //    FALSE)) 
+            //{
+            //    DbgPrint("TRUE");
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+            // 
+            // 
+            //DbgPrint("2"); //FALSE
+            //if (RtlEqualUnicodeString(
+            //    //&required_extension,
+            //    //&global_required_extension,
+            //    &global_UNICODE_STRING,
+            //    &NameInfo->Extension,
+            //    FALSE)) 
+            //{
+            //    DbgPrint("TRUE");
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            DbgPrint("3"); //TRUE вручную задавалось
+
+            if (RtlEqualUnicodeString(
+                //&required_extension,
+                &global_required_extension,
+                &NameInfo->Extension,
+                FALSE))
+            {
+                DbgPrint("TRUE");
+            }
+            else
+            {
+                DbgPrint("FALSE");
+            }
+           
+            //DbgPrint("4"); //TRUE сравнение 1го символа вероятно
+
+            //if (NameInfo->Extension.Buffer==global_file_extensions)
+            //{
+            //    DbgPrint("TRUE");
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            //DbgPrint("5"); 
+            ////DbgPrint(wcscmp( NameInfo->Extension.Buffer , global_file_extensions));
+            ////int isNameMatch = wcscmp(NameInfo->Extension.Buffer, global_file_extensions); //проверить ещё раз - crash
+            //if (wcscmp( NameInfo->Extension.Buffer , global_file_extensions)==0)
+            //{
+            //    DbgPrint("TRUE");
+
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            /*DbgPrint("isNameMatch");
+            DbgPrint(isNameMatch);*/
+
+            DbgPrint("6");
+            //char new_u_str[64]= NameInfo->Extension;
+            wchar_t* new_u_str = global_file_extensions;
+            ////wStrBuf(NameInfo->Extension.Buffer, NameInfo->Extension.Length / sizeof(WCHAR));
+            ////const wchar_t* wStr = wStrBuf.c_str();
+
+            DbgPrint("new_u_str");
+            DbgPrint(new_u_str);
+
+            //DbgPrint("7");
+            ////DbgPrint(wcscmp( NameInfo->Extension.Buffer , global_file_extensions));
+            ////int isNameMatch = wcscmp(NameInfo->Extension.Buffer, new_u_str); //проверить ещё раз - crash
+
+            ////DbgPrint("isNameMatch"); DbgPrint(isNameMatch);
+
+            //DbgPrint("len");
+            //DbgPrint(wcslen(new_u_str));
+            //if (wcscmp(NameInfo->Extension.Buffer, new_u_str) == 0)
+            //{
+            //    DbgPrint("TRUE");
+
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            //for (int b = 0; b < 5; b++)
+            //{
+            //    DbgPrint(new_u_str[b]);
+            //    DbgPrint(new_u_str[b] == NameInfo->Extension.Buffer[b]);
+            //    DbgPrint("--\n");
+            //    if (new_u_str[b] == NameInfo->Extension.Buffer[b])
+            //    {
+            //        DbgPrint(b);
+            //        DbgPrint("true");
+            //    }
+            //}
+
+
+            //DbgPrint("8");
+
+
+            ////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
+            //int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str); //
+            //DbgPrint("isNameMatch"); DbgPrint(isNameMatch);
+            //if (isNameMatch == 0) //always true
+            //{
+            //    DbgPrint("TRUE");
+
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            //if (isNameMatch != NULL) //always false
+            //{
+            //    DbgPrint("TRUE");
+
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            
+
+            ////DbgPrint("9");
+            //////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //
+            //////int isNameMatchcmp = wcscmp((NameInfo->Extension), new_u_str); //crash
+            ////int isNameMatchcmp = wcscmp(NameInfo->Extension.Buffer, (wchar_t)new_u_str); //crash
+            ////DbgPrint("isNameMatch"); DbgPrint(isNameMatchcmp);
+            ////if (isNameMatchcmp == 0) // 
+            ////{
+            ////    DbgPrint("TRUE");
+
+            ////}
+            ////else
+            ////{
+            ////    DbgPrint("FALSE");
+            ////}
+
+            ////if (isNameMatchcmp != NULL) // 
+            ////{
+            ////    DbgPrint("TRUE");
+
+            ////}
+            ////else
+            ////{
+            ////    DbgPrint("FALSE");
+            ////}
+
+
+            ////DbgPrint("10"); //пробуем в юникод превратить
+            //////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //
+            ////int isNameMatchcmp = wcscmp(NameInfo->Extension.Buffer, new_u_str); //crash
+            ////DbgPrint("isNameMatch"); DbgPrint(isNameMatchcmp);
+            ////if (RtlEqualUnicodeString(
+            ////    //&required_extension,
+            ////    //&global_required_extension,
+            ////    &new_u_str,
+            ////    &NameInfo->Extension,
+            ////    FALSE))  // 
+            ////{
+            ////    DbgPrint("TRUE");
+
+            ////}
+            ////else
+            ////{
+            ////    DbgPrint("FALSE");
+            ////}
+
+
+           
+
+            //DbgPrint("11");
+            //////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //
+            //wchar_t wStr [64];
+            //memset(wStr, 0, 64);
+            //memcpy(wStr, NameInfo->Extension.Buffer, NameInfo->Extension.Length); 
+            //int isNameMatchcmp = wcscmp(wStr, new_u_str); //
+            ////int isNameMatchcmp = wcscmp(NameInfo->Extension.Buffer, (wchar_t)new_u_str); //
+            //DbgPrint("isNameMatch"); DbgPrint(isNameMatchcmp);
+            //if (isNameMatchcmp == 0) // 
+            //{
+            //    DbgPrint("TRUE");
+
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            //if (isNameMatchcmp != NULL) // 
+            //{
+            //    DbgPrint("TRUE");
+
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+
+            //free(wStr);
+
+            DbgPrint("len ext file");
+
+            DbgPrint((uint64_t)NameInfo); // x
+            DbgPrint("%u", NameInfo->Extension.Length); //16
+            DbgPrint("--\n");
 
             DbgPrint("Extension.Buffer:");
-            DbgPrint(NameInfo->Extension.Buffer);
-            DbgPrint("Extension.Buffer2:");
-            DbgPrint(&NameInfo->Extension.Buffer);
+            DbgPrint("%hhu", +NameInfo->Extension.Buffer[1]); //111 = o
+            DbgPrint(NameInfo->Extension.Buffer[1]);
 
-            DbgPrint("test:");
-            DbgPrint(((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions)) != NULL);
+            //DbgPrint("test:");
+            //DbgPrint(((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions)));
 
             DbgPrint("global_file_extension:");
             DbgPrint(global_file_extensions);
 
             DbgPrint("\n");
             DbgPrint("ext file:");
-            DbgPrint(&NameInfo->Extension);
             //DbgPrint("ext need:");
             //DbgPrint(("Unicode string: %wZ\n", &required_extension));
-            //DbgPrint(("Unicode string: %wZ\n", &global_required_extension));
+
+            DbgPrint("Unicode string: %wZ\n", NameInfo->Extension);//Unicode string: tohsyrov
+            DbgPrint("Unicode string: %wZ\n", global_required_extension);//Unicode string: tohsyrov
 
             //проверка на событие IRP_MJ_WRITE
             if (Data->Iopb->MajorFunction == IRP_MJ_WRITE) {
