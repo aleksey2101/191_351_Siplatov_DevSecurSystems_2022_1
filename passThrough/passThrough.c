@@ -42,6 +42,7 @@ ULONG_PTR OperationStatusCtx = 1;
 
 ULONG gTraceFlags = 0;
 
+int global_file_extensions_flag = 0;
 
 #define PT_DBG_PRINT( _dbgLevel, _string )          \
     (FlagOn(gTraceFlags,(_dbgLevel)) ?              \
@@ -614,7 +615,7 @@ NTSTATUS MiniSendRec(PVOID portcookie, PVOID InputBuffer, ULONG InputBufferLengt
 
     DbgPrint(("global_file_extensions"));
     DbgPrint(global_file_extensions);
-
+    global_file_extensions_flag = 1;
 
     strcpy((PCHAR)OutputBuffer, msg);
     return STATUS_SUCCESS;
@@ -959,7 +960,7 @@ Return Value:
 }
 
 
-int global_file_extensions_flag = 0;
+
 FLT_POSTOP_CALLBACK_STATUS
 PtPostOperationPassThrough(
     _Inout_ PFLT_CALLBACK_DATA Data,
@@ -1028,7 +1029,6 @@ Return Value:
     //PCHAR required_extension = "tohsyrov"; // Перевод расширения в UNICODE_STRING
     //UNICODE_STRING global_UNICODE_STRING = RTL_CONSTANT_STRING(global_file_extensions);
 
-
     if (!NT_SUCCESS(status)) {
         //ничего не выводим, чтобы не загружать оперативную память, DebugView
     }
@@ -1039,34 +1039,18 @@ Return Value:
            // &global_UNICODE_STRING,
         &NameInfo->Extension, 
         FALSE)
-        //||
-        //RtlEqualUnicodeString(
-        //    //&required_extension,
-        //    //&global_required_extension,
-        //    &global_UNICODE_STRING,
-        //    &NameInfo->Extension,
-        //    FALSE)
 
         //пробуем
-        //(NameInfo->Extension.Buffer == global_file_extensions)
+        
+         //(global_file_extensions_flag != 0) /* && wcscmp(buf_ext, global_file_extensions) == 0)*/
         //((global_file_extensions_flag != 0) && ((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions) != NULL) == 1)
         ) 
          {
-            DbgPrint("1"); //TRUE
-            UNICODE_STRING s = global_required_extension; //TRUE
-            //UNICODE_STRING s = (UNICODE_STRING) global_file_extensions;
-            if (RtlEqualUnicodeString(
-                &s,
-                &NameInfo->Extension,
-                FALSE)) {
-                DbgPrint("TRUE");
-            }else
-            {
-                DbgPrint("FALSE");
-            }
-
-            
-
+        wchar_t buf_ext[64];
+        memset(buf_ext, 0, sizeof(buf_ext));
+        memcpy(buf_ext, NameInfo->Extension.Buffer, NameInfo->Extension.Length);
+        if(/*wcscmp(buf_ext, global_file_extensions)*/0 == 0)
+         {
             DbgPrint("1.1.1"); 
             /*UNICODE_STRING us;
             RtlInitString(&us, global_file_extensions);*/
@@ -1075,10 +1059,11 @@ Return Value:
             memset(buf, 0, sizeof(buf));
             memcpy(buf, NameInfo->Extension.Buffer, NameInfo->Extension.Length);
 
+
             //DbgPrint("us Unicode string: %wZ\n", us);//Unicode string: tohsyrov
 
             DbgPrint("Unicode ext string: %wZ\n", NameInfo->Extension);
-            DbgPrint("buf");
+            DbgPrint("buf");    
             DbgPrint(buf);//t
 
             DbgPrint("global_file_extension:");
@@ -1095,6 +1080,59 @@ Return Value:
             }
             int i = wcscmp(buf, global_file_extensions);
             DbgPrint("%d", i); //-28000
+
+            
+
+            DbgPrint("1.21--without spaces"); //TRUE сравнение 1го символа вероятно
+
+            //int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
+            int isNameMatch = wcsstr(global_file_extensions, buf) != NULL; //всегда true (0)
+            //DbgPrint("buf2"); 
+            if (isNameMatch >= 0) //always true
+            {
+                DbgPrint("TRUE");
+
+            }
+            else
+            {
+                DbgPrint("FALSE");
+            }
+            DbgPrint("%d", isNameMatch);//0
+
+            DbgPrint("result: \"%ls\"\n", wcsstr(global_file_extensions, buf)!=NULL);
+
+            DbgPrint("1.22--without spaces"); //TRUE сравнение 1го символа вероятно
+
+            //int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
+            int isNameMatch1 = wcsstr(global_file_extensions, buf); //
+            //DbgPrint("buf2"); 
+            if (isNameMatch1 >= 0) //always true
+            {
+                DbgPrint("TRUE");
+
+            }
+            else
+            {
+                DbgPrint("FALSE");
+            }
+            DbgPrint("%d", isNameMatch1);//0
+
+            DbgPrint("result: \"%ls\"\n", wcsstr(global_file_extensions, buf));
+            
+            DbgPrint("1.23--without spaces");
+            wchar_t isNameMatch_w = wcsstr(global_file_extensions, buf); //
+            //DbgPrint("buf2"); 
+            if (isNameMatch_w != NULL) //always true
+            {
+                DbgPrint("TRUE");
+
+            }
+            else
+            {
+                DbgPrint("FALSE");
+            }
+            DbgPrint(isNameMatch_w);//0
+            
             //txt exe pub siplatov
             //ext file = sip
             //int k = wstrstr(global_file_extensions, " "); //5
@@ -1104,13 +1142,68 @@ Return Value:
             //int i = wcsncmp(buf, global_file_extensions, 8);
             //DbgPrint("%d", i); //-28000
 
+            wchar_t p [64] = L" ";
+            wchar_t * buf00 = wcscat(buf, L" ");
+            //buf2 = wcsncat(p, buf2, 1);
+            wchar_t * buf2 = wcscat(p, buf00);
+            DbgPrint("2--");
+            DbgPrint("buf");
+            DbgPrint(buf);
 
+            DbgPrint("buf00");
+            DbgPrint(buf00);
+
+            DbgPrint("p");
+            DbgPrint(p);
+            
+            DbgPrint("buf2");
+            DbgPrint(buf2);
+
+            DbgPrint("Length buf00 is %i\n", wcslen(buf00));//9
+            DbgPrint("Length p is %i\n", wcslen(p));//10
+            DbgPrint("Length buf is %i\n", wcslen(buf));//9
+
+            DbgPrint("Length buf2 is %i\n", wcslen(buf2)); //10
+
+            //DbgPrint("global_file_extension:");
+            //DbgPrint(global_file_extensions);//tohsyrov
+
+            DbgPrint("3---"); //TRUE вручную задавалось
+            wchar_t ext_list[64];
+            memset(ext_list, 0, sizeof(ext_list));
+            memcpy(ext_list, global_file_extensions, wcslen(global_file_extensions));
+
+            wchar_t p_ext_list[64] = L" ";
+            DbgPrint("Length ext_list is %i\n", wcslen(ext_list));//27
+
+            DbgPrint("Length global_file_extensions is %i\n", wcslen(global_file_extensions));//27
+            /*wchar_t* ext_list00 = */wcscat(ext_list, L" ");
+            //buf2 = wcsncat(p, buf2, 1);
+            wchar_t* ext_list2 = wcscat(p_ext_list, ext_list);
+
+            DbgPrint("ext_list");
+            DbgPrint(ext_list);
+
+            DbgPrint("p_ext_list");
+            DbgPrint(p_ext_list);
+            DbgPrint("ext_list2");
+            DbgPrint(ext_list2);
+
+            DbgPrint("Length ext_list is %i\n", wcslen(ext_list));//28
+            DbgPrint("Length p_ext_list is %i\n", wcslen(p_ext_list));//29
+
+            DbgPrint("Length ext_list2 is %i\n", wcslen(ext_list2));//29
+
+            //wchar_t global_file_extensions2 = wcsncat(global_file_extensions, p, 1);
+            //global_file_extensions2 = wcsncat(p, global_file_extensions2, 1);
+            //DbgPrint("buf2");
+            //DbgPrint(buf2);//t
+
+            //DbgPrint("global_file_extensions2:");
+            //DbgPrint(global_file_extensions2);//tohsyrov
 
             ////us 000
-            //if (RtlEqualUnicodeString( //FALSE
-            //    &us,
-            //    &NameInfo->Extension,
-            //    FALSE)) 
+            //if (wcscmp(buf2, global_file_extensions2) == 0) //FALSE
             //{
             //    DbgPrint("TRUE");
             //}
@@ -1118,49 +1211,42 @@ Return Value:
             //{
             //    DbgPrint("FALSE");
             //}
-            // 
-            // 
-            //DbgPrint("2"); //FALSE
-            //if (RtlEqualUnicodeString(
-            //    //&required_extension,
-            //    //&global_required_extension,
-            //    &global_UNICODE_STRING,
-            //    &NameInfo->Extension,
-            //    FALSE)) 
-            //{
-            //    DbgPrint("TRUE");
-            //}
-            //else
-            //{
-            //    DbgPrint("FALSE");
-            //}
+            //i = wcscmp(buf2, global_file_extensions2);
+            //DbgPrint("%d", i); //-28000
 
-            DbgPrint("3"); //TRUE вручную задавалось
+            
+            DbgPrint("4--with spaces"); //TRUE сравнение 1го символа вероятно
 
-            if (RtlEqualUnicodeString(
-                //&required_extension,
-                &global_required_extension,
-                &NameInfo->Extension,
-                FALSE))
+            //int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
+            int isNameMatch2 = wcsstr(ext_list2, buf); //
+            //DbgPrint("buf2"); 
+            if (isNameMatch2 >= 0) //always true
             {
                 DbgPrint("TRUE");
+
             }
             else
             {
                 DbgPrint("FALSE");
             }
-           
-            //DbgPrint("4"); //TRUE сравнение 1го символа вероятно
+            DbgPrint("%d", isNameMatch2);//0
 
-            //if (NameInfo->Extension.Buffer==global_file_extensions)
-            //{
-            //    DbgPrint("TRUE");
-            //}
-            //else
-            //{
-            //    DbgPrint("FALSE");
-            //}
+            DbgPrint("5--with spaces");
 
+            int isNameMatch3 = wcsstr(buf, ext_list2); //
+            //DbgPrint("buf2"); 
+            if (isNameMatch3 >= 0) //always true
+            {
+                DbgPrint("TRUE");
+
+            }
+            else
+            {
+                DbgPrint("FALSE");
+            }
+            DbgPrint("%d", isNameMatch3);//0
+            // 
+            // 
             //DbgPrint("5"); 
             ////DbgPrint(wcscmp( NameInfo->Extension.Buffer , global_file_extensions));
             ////int isNameMatch = wcscmp(NameInfo->Extension.Buffer, global_file_extensions); //проверить ещё раз - crash
@@ -1177,33 +1263,34 @@ Return Value:
             /*DbgPrint("isNameMatch");
             DbgPrint(isNameMatch);*/
 
-            DbgPrint("6");
-            //char new_u_str[64]= NameInfo->Extension;
-            wchar_t* new_u_str = global_file_extensions;
-            ////wStrBuf(NameInfo->Extension.Buffer, NameInfo->Extension.Length / sizeof(WCHAR));
-            ////const wchar_t* wStr = wStrBuf.c_str();
+            //DbgPrint("6");
+            ////char new_u_str[64]= NameInfo->Extension;
+            //wchar_t* new_u_str = global_file_extensions;
+            //////wStrBuf(NameInfo->Extension.Buffer, NameInfo->Extension.Length / sizeof(WCHAR));
+            //////const wchar_t* wStr = wStrBuf.c_str();
 
-            DbgPrint("new_u_str");
-            DbgPrint(new_u_str);
+            //DbgPrint("new_u_str");
+            //DbgPrint(new_u_str);
 
-            //DbgPrint("7");
-            ////DbgPrint(wcscmp( NameInfo->Extension.Buffer , global_file_extensions));
-            ////int isNameMatch = wcscmp(NameInfo->Extension.Buffer, new_u_str); //проверить ещё раз - crash
+            ////DbgPrint("7");
+            //////DbgPrint(wcscmp( NameInfo->Extension.Buffer , global_file_extensions));
+            //////int isNameMatch = wcscmp(NameInfo->Extension.Buffer, new_u_str); //проверить ещё раз - crash
 
-            ////DbgPrint("isNameMatch"); DbgPrint(isNameMatch);
+            //////DbgPrint("isNameMatch"); DbgPrint(isNameMatch);
 
-            //DbgPrint("len");
-            //DbgPrint(wcslen(new_u_str));
-            //if (wcscmp(NameInfo->Extension.Buffer, new_u_str) == 0)
-            //{
-            //    DbgPrint("TRUE");
+            ////DbgPrint("len");
+            ////DbgPrint(wcslen(new_u_str));
+            ////if (wcscmp(NameInfo->Extension.Buffer, new_u_str) == 0)
+            ////{
+            ////    DbgPrint("TRUE");
 
-            //}
-            //else
-            //{
-            //    DbgPrint("FALSE");
-            //}
+            ////}
+            ////else
+            ////{
+            ////    DbgPrint("FALSE");
+            ////}
 
+            ////сравнение в цикле (работает, но слишком веселое решение)
             //for (int b = 0; b < 5; b++)
             //{
             //    DbgPrint(new_u_str[b]);
@@ -1217,7 +1304,7 @@ Return Value:
             //}
 
 
-            //DbgPrint("8");
+            DbgPrint("8");
 
 
             ////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
@@ -1423,10 +1510,11 @@ Return Value:
                     DbgPrint(hexarray);//вывод массива символов
 
                     //передаем весь расшифрованный текст в буфер записи
-                    for (int i = 0; i<strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer); i++) {
+                    for (int i = 0; i < strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer); i++) {
                         ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
                     }
                 }
+            }
          }
     }
     return FLT_POSTOP_FINISHED_PROCESSING;
