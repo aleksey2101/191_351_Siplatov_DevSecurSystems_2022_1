@@ -224,6 +224,12 @@ void CMFCApplication1Dlg::OnBnClickedButton2()
 	char strPass[256];
 	strcpy_s(strPass, CStringA(str).GetString());
 
+	wchar_t* my_msg = (wchar_t*)ptr;
+
+	//// TODO: добавьте свой код обработчика уведомлений
+	//wchar_t* str = nullptr;
+	//m_EditCtrl1.GetWindowTextW(str);
+
 	if (port == NULL)
 	{
 		if (FilterConnectCommunicationPort(L"\\mf", 0, NULL, 0, NULL, &port)) {
@@ -233,7 +239,7 @@ void CMFCApplication1Dlg::OnBnClickedButton2()
 		}
 	}
 
-	if (FilterSendMessage(port, strPass, strlen(strPass), recbuffer, 50, &byterec)) {
+	if (FilterSendMessage(port, my_msg, strlen(ptr), recbuffer, 50, &byterec)) {
 
 	}
 	else
