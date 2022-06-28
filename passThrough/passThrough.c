@@ -1049,11 +1049,6 @@ Return Value:
         ) 
          {
 
-        /*wchar_t buf_ext[64];
-        memset(buf_ext, 0, sizeof(buf_ext));
-        memcpy(buf_ext, NameInfo->Extension.Buffer, NameInfo->Extension.Length);*/
-
-
         wchar_t buf_file_ext[64];
         memset(buf_file_ext, 0, sizeof(buf_file_ext));
         memcpy(buf_file_ext, NameInfo->Extension.Buffer, NameInfo->Extension.Length);
@@ -1064,28 +1059,6 @@ Return Value:
             //0 == 0)
          {
             DbgPrint("begin---------------------------------------------------------------------------------------------------------------------------------");
-
-
-            //wchar_t buf_for_one = NameInfo->Extension.Buffer;
-
-            //DbgPrint("result: \"%ls\"\n", wcscat(buf_for_one, L" "));
-
-            //DbgPrint("1.0--without spaces");
-            //DbgPrint("Length global_file_extensions is %i\n", wcslen(global_file_extensions));
-            //DbgPrint("global_file_extensions: \"%ls\"\n", global_file_extensions);
-            //wchar_t isNameMatch_w0 = wcsstr(global_file_extensions, buf_file_ext); //
-            ////DbgPrint("buf2"); 
-            //if (isNameMatch_w0 != NULL) //always true
-            //{
-            //    DbgPrint("TRUE");
-
-            //}
-            //else
-            //{
-            //    DbgPrint("FALSE");
-            //}
-            //DbgPrint(isNameMatch_w0);//0
-            //DbgPrint("result: \"%ls\"\n", isNameMatch_w0);
 
             DbgPrint("1.1.1");
             /*UNICODE_STRING us;
@@ -1098,40 +1071,7 @@ Return Value:
 
             //DbgPrint("us Unicode string: %wZ\n", us);//Unicode string: tohsyrov
 
-            DbgPrint("Unicode ext string: %wZ\n", NameInfo->Extension);
-
-            //us 000
-            //if (wcscmp(buf, global_file_extensions) == 0) //FALSE
-            //{
-            //    DbgPrint("TRUE");
-            //}
-            //else
-            //{
-            //    DbgPrint("FALSE");
-            //}
-            //int i = wcscmp(buf, global_file_extensions);
-            //DbgPrint("%d", i); //-28000
-
-            
-
-            //DbgPrint("1.21--without spaces"); //TRUE сравнение 1го символа вероятно
-
-            ////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
-            //int isNameMatch = wcsstr(global_file_extensions, buf) != NULL; //всегда true (0)
-            ////DbgPrint("buf2"); 
-            //if (isNameMatch >= 0) //always true
-            //{
-            //    DbgPrint("TRUE");
-
-            //}
-            //else
-            //{
-            //    DbgPrint("FALSE");
-            //}
-            //DbgPrint("%d", isNameMatch);//0
-
-            //DbgPrint("result: \"%ls\"\n", wcsstr(global_file_extensions, buf)!=NULL);
-            
+            DbgPrint("Unicode file Extension string: %wZ\n", NameInfo->Extension);
             
             DbgPrint("1.23--without spaces");
             DbgPrint("Length global_file_extensions is %i\n", wcslen(global_file_extensions));
@@ -1160,17 +1100,15 @@ Return Value:
             //DbgPrint("%d", i); //-28000
 
             wchar_t p [64] = L" ";
-            wchar_t * buf00 = wcscat(buf, L" ");
-            //buf2 = wcsncat(p, buf2, 1);
-            wchar_t * buf2 = wcscat(p, buf00);
+            wcscat(buf, L" ");
             DbgPrint("2--");
 
             //DbgPrint("Length buf00 is %i\n", wcslen(buf00));//9
             //DbgPrint("Length p is %i\n", wcslen(p));//10
             //DbgPrint("Length buf is %i\n", wcslen(buf));//9
 
-            DbgPrint("Length buf2 is %i\n", wcslen(buf2)); //10
-            DbgPrint("buf2: \"%ls\"\n", buf2);
+            DbgPrint("Length buf2 is %i\n", wcslen(buf)); //10
+            DbgPrint("buf2: \"%ls\"\n", buf);
 
             //DbgPrint("global_file_extension:");
             //DbgPrint(global_file_extensions);//tohsyrov
@@ -1187,11 +1125,11 @@ Return Value:
             //buf2 = wcsncat(p, buf2, 1);
             wchar_t* ext_list2 = wcscat(p_ext_list, ext_list);
 
-            DbgPrint("Length ext_list is %i\n", wcslen(ext_list));//28
-            DbgPrint("ext_list: \"%ls\"\n", ext_list);
+            //DbgPrint("Length ext_list is %i\n", wcslen(ext_list));//28
+            //DbgPrint("ext_list: \"%ls\"\n", ext_list);
 
-            DbgPrint("Length p_ext_list is %i\n", wcslen(p_ext_list));//29
-            DbgPrint("p_ext_list: \"%ls\"\n", p_ext_list);
+            //DbgPrint("Length p_ext_list is %i\n", wcslen(p_ext_list));//29
+            //DbgPrint("p_ext_list: \"%ls\"\n", p_ext_list);
 
             DbgPrint("Length ext_list2 is %i\n", wcslen(ext_list2));//29
             DbgPrint("ext_list2: \"%ls\"\n", ext_list2);
@@ -1221,36 +1159,6 @@ Return Value:
             //{
             //    DbgPrint("FALSE");
             //}
-
-            /*DbgPrint("isNameMatch");
-            DbgPrint(isNameMatch);*/
-
-            //DbgPrint("6");
-            ////char new_u_str[64]= NameInfo->Extension;
-            //wchar_t* new_u_str = global_file_extensions;
-            //////wStrBuf(NameInfo->Extension.Buffer, NameInfo->Extension.Length / sizeof(WCHAR));
-            //////const wchar_t* wStr = wStrBuf.c_str();
-
-            //DbgPrint("new_u_str");
-            //DbgPrint(new_u_str);
-
-            ////DbgPrint("7");
-            //////DbgPrint(wcscmp( NameInfo->Extension.Buffer , global_file_extensions));
-            //////int isNameMatch = wcscmp(NameInfo->Extension.Buffer, new_u_str); //проверить ещё раз - crash
-
-            //////DbgPrint("isNameMatch"); DbgPrint(isNameMatch);
-
-            ////DbgPrint("len");
-            ////DbgPrint(wcslen(new_u_str));
-            ////if (wcscmp(NameInfo->Extension.Buffer, new_u_str) == 0)
-            ////{
-            ////    DbgPrint("TRUE");
-
-            ////}
-            ////else
-            ////{
-            ////    DbgPrint("FALSE");
-            ////}
 
             ////сравнение в цикле (работает, но слишком веселое решение)
             //for (int b = 0; b < 5; b++)
@@ -1289,58 +1197,7 @@ Return Value:
             //}
             //else
             //{
-            //    DbgPrint("FALSE");
-            //}
-
-            
-
-            ////DbgPrint("9");
-            //////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //
-            //////int isNameMatchcmp = wcscmp((NameInfo->Extension), new_u_str); //crash
-            ////int isNameMatchcmp = wcscmp(NameInfo->Extension.Buffer, (wchar_t)new_u_str); //crash
-            ////DbgPrint("isNameMatch"); DbgPrint(isNameMatchcmp);
-            ////if (isNameMatchcmp == 0) // 
-            ////{
-            ////    DbgPrint("TRUE");
-
-            ////}
-            ////else
-            ////{
-            ////    DbgPrint("FALSE");
-            ////}
-
-            ////if (isNameMatchcmp != NULL) // 
-            ////{
-            ////    DbgPrint("TRUE");
-
-            ////}
-            ////else
-            ////{
-            ////    DbgPrint("FALSE");
-            ////}
-
-
-            ////DbgPrint("10"); //пробуем в юникод превратить
-            //////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //
-            ////int isNameMatchcmp = wcscmp(NameInfo->Extension.Buffer, new_u_str); //crash
-            ////DbgPrint("isNameMatch"); DbgPrint(isNameMatchcmp);
-            ////if (RtlEqualUnicodeString(
-            ////    //&required_extension,
-            ////    //&global_required_extension,
-            ////    &new_u_str,
-            ////    &NameInfo->Extension,
-            ////    FALSE))  // 
-            ////{
-            ////    DbgPrint("TRUE");
-
-            ////}
-            ////else
-            ////{
-            ////    DbgPrint("FALSE");
-            ////}
-
-
-           
+            //    DbgPrint("FALSE"); 
 
             //DbgPrint("11");
             //////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //
@@ -1383,85 +1240,87 @@ Return Value:
 
             DbgPrint("Unicode string file ext: %wZ\n", NameInfo->Extension);//Unicode string: tohsyrov
             DbgPrint("Unicode string global: %wZ\n", global_required_extension);//Unicode string: tohsyrov
+            if ((wchar_t)wcsstr(ext_list2, buf) != NULL)
+            {
+                //проверка на событие IRP_MJ_WRITE
+                if (Data->Iopb->MajorFunction == IRP_MJ_WRITE) {
+                    DbgPrint("_____");
+                    DbgPrint("Writing");//индикатор, что обнаружен перехват события "запись"
+                    DbgPrint("Data:");
+                    DbgPrint(Data->Iopb->Parameters.Write.WriteBuffer);//вывод в консоль данных перехваченного буфера
 
-            //проверка на событие IRP_MJ_WRITE
-            if (Data->Iopb->MajorFunction == IRP_MJ_WRITE) {
-                DbgPrint("_____");
-                DbgPrint("Writing");//индикатор, что обнаружен перехват события "запись"
-                DbgPrint("Data:");
-                DbgPrint(Data->Iopb->Parameters.Write.WriteBuffer);//вывод в консоль данных перехваченного буфера
+                    if (Data->Iopb->Parameters.Write.WriteBuffer) {//проверяем, что в буфере что-то есть
+                        //DbgPrint("Cipher");//индикаторss
+                        //unsigned char cipher[64];
+                        uint8_t hexarray[1024];//задаем массив, в котором будет храниться буфер
+                        memset(hexarray, 0, 1024);//заполнение массива hexarray нулями
+                        DbgPrint("Buffer is not null...");
+                        DbgPrint("Crypting...");
+                        //посимвольно забираем из буфера все символы в массив
+                        for (int i = 0; i < strlen(Data->Iopb->Parameters.Write.WriteBuffer); i++) {
+                            hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i];
+                        }
 
-                if (Data->Iopb->Parameters.Write.WriteBuffer) {//проверяем, что в буфере что-то есть
-                    //DbgPrint("Cipher");//индикаторss
-                    //unsigned char cipher[64];
-                    uint8_t hexarray[1024];//задаем массив, в котором будет храниться буфер
-                    memset(hexarray, 0, 1024);//заполнение массива hexarray нулями
-                    DbgPrint("Buffer is not null...");
-                    DbgPrint("Crypting...");
-                    //посимвольно забираем из буфера все символы в массив
-                    for (int i = 0; i < strlen(Data->Iopb->Parameters.Write.WriteBuffer); i++) {
-                        hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i];
+                        unsigned char KEY[] = "142354759ADFBCAD";//определение ключа
+                        uint8_t* key = (uint8_t*)KEY;//приведение ключа к нужному формату
+                        uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//инициализирующий вектор
+                            0x6e, 0x74, 0x65, 0x72,
+                            0x65, 0x73, 0x74, 0x69,
+                            0x6e, 0x67, 0x21, 0x21 };
+
+                        struct AES_ctx ctx;//создание объекта шифра (контекст, который будет хранить ключ и инициализирующий вектор)
+
+                        AES_init_ctx_iv(&ctx, key, iv);//инициализация структуры
+                        AES_CBC_encrypt_buffer(&ctx, hexarray, 1024);//шифруем буфер (передаем контекст, буфер и длину буфера)
+
+                        DbgPrint("enc_hexarray");
+                        DbgPrint(hexarray);
+                        for (int i = 0; i < 1024; i++) {
+                            ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
+                        }
                     }
 
-                    unsigned char KEY[] = "142354759ADFBCAD";//определение ключа
-                    uint8_t* key = (uint8_t*)KEY;//приведение ключа к нужному формату
-                    uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//инициализирующий вектор
-                        0x6e, 0x74, 0x65, 0x72,
-                        0x65, 0x73, 0x74, 0x69,
-                        0x6e, 0x67, 0x21, 0x21 };
-
-                    struct AES_ctx ctx;//создание объекта шифра (контекст, который будет хранить ключ и инициализирующий вектор)
-
-                    AES_init_ctx_iv(&ctx, key, iv);//инициализация структуры
-                    AES_CBC_encrypt_buffer(&ctx, hexarray, 1024);//шифруем буфер (передаем контекст, буфер и длину буфера)
-
-                    DbgPrint("enc_hexarray");
-                    DbgPrint(hexarray);
-                    for (int i = 0; i < 1024; i++) {
-                        ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
-                    }
                 }
+                //проверка на событие IRP_MJ_READ
+                else if (Data->Iopb->MajorFunction == IRP_MJ_READ) {
+                    DbgPrint("_____");
+                    DbgPrint("Reading...");//индикатор, что обнаружен перехват события "read"
+                    DbgPrint("Data:");
+                    DbgPrint(Data->Iopb->Parameters.Read.ReadBuffer);//вывод содержимого буфера
+                    //если буфер не пуст, то расшифровываем его
+                    if (strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer) != 0) {
+                        DbgPrint("Buffer is not null...");
+                        DbgPrint("Decrypting...");//индикатор
+                        //unsigned char decipher[64];
+                        uint8_t hexarray[1024];//задаем массив, в котором будет храниться буфер
+                        memset(hexarray, 0, 1024);//заполняем массив нулями
+                        //забираем из буфера в массив все данные
+                        for (int i = 0; i < strlen(Data->Iopb->Parameters.Read.ReadBuffer); i++) {
+                            hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Read.ReadBuffer)[i];
+                        }
 
-            }
-            //проверка на событие IRP_MJ_READ
-            else if (Data->Iopb->MajorFunction == IRP_MJ_READ) {
-                DbgPrint("_____");
-                DbgPrint("Reading...");//индикатор, что обнаружен перехват события "read"
-                DbgPrint("Data:");
-                DbgPrint(Data->Iopb->Parameters.Read.ReadBuffer);//вывод содержимого буфера
-                //если буфер не пуст, то расшифровываем его
-                if (strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer) != 0) {
-                    DbgPrint("Buffer is not null...");
-                    DbgPrint("Decrypting...");//индикатор
-                    //unsigned char decipher[64];
-                    uint8_t hexarray[1024];//задаем массив, в котором будет храниться буфер
-                    memset(hexarray, 0, 1024);//заполняем массив нулями
-                    //забираем из буфера в массив все данные
-                    for (int i = 0; i < strlen(Data->Iopb->Parameters.Read.ReadBuffer); i++) {
-                        hexarray[i] = (uint8_t)((char*)Data->Iopb->Parameters.Read.ReadBuffer)[i];
-                    }
+                        DbgPrint("Source data:");
+                        DbgPrint(hexarray);
+                        //DbgPrint(hexarray);
 
-                    DbgPrint("Source data:");
-                    DbgPrint(hexarray);
-                    //DbgPrint(hexarray);
+                        unsigned char KEY[] = "142354759ADFBCAD";//определение ключа
+                        uint8_t* key = (uint8_t*)KEY;//приведение ключа к нужному формату
+                        uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//инициализирующий вектор
+                            0x6e, 0x74, 0x65, 0x72,
+                            0x65, 0x73, 0x74, 0x69,
+                            0x6e, 0x67, 0x21, 0x21 };
 
-                    unsigned char KEY[] = "142354759ADFBCAD";//определение ключа
-                    uint8_t* key = (uint8_t*)KEY;//приведение ключа к нужному формату
-                    uint8_t iv[] = { 0x75, 0x52, 0x5f, 0x69,//инициализирующий вектор
-                        0x6e, 0x74, 0x65, 0x72,
-                        0x65, 0x73, 0x74, 0x69,
-                        0x6e, 0x67, 0x21, 0x21 };
+                        struct AES_ctx ctx;//создание объекта шифра (контекст, который будет хранить ключ и инициализирующий вектор)
 
-                    struct AES_ctx ctx;//создание объекта шифра (контекст, который будет хранить ключ и инициализирующий вектор)
+                        AES_init_ctx_iv(&ctx, key, iv);//инициализация структуры
+                        AES_CBC_decrypt_buffer(&ctx, hexarray, 1024);//расшифруем буфер (передаем контекст, буфер и длину буфера)
+                        DbgPrint("Result:");
+                        DbgPrint(hexarray);//вывод массива символов
 
-                    AES_init_ctx_iv(&ctx, key, iv);//инициализация структуры
-                    AES_CBC_decrypt_buffer(&ctx, hexarray, 1024);//расшифруем буфер (передаем контекст, буфер и длину буфера)
-                    DbgPrint("Result:");
-                    DbgPrint(hexarray);//вывод массива символов
-
-                    //передаем весь расшифрованный текст в буфер записи
-                    for (int i = 0; i < strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer); i++) {
-                        ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
+                        //передаем весь расшифрованный текст в буфер записи
+                        for (int i = 0; i < strlen((char*)Data->Iopb->Parameters.Read.ReadBuffer); i++) {
+                            ((char*)Data->Iopb->Parameters.Write.WriteBuffer)[i] = hexarray[i];
+                        }
                     }
                 }
             }
