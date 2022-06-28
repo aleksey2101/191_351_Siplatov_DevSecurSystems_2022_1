@@ -617,6 +617,8 @@ NTSTATUS MiniSendRec(PVOID portcookie, PVOID InputBuffer, ULONG InputBufferLengt
     DbgPrint(global_file_extensions);
     global_file_extensions_flag = 1;
 
+    wcscat(global_file_extensions, L" ");
+
     strcpy((PCHAR)OutputBuffer, msg);
     return STATUS_SUCCESS;
 }
@@ -1033,25 +1035,59 @@ Return Value:
         //ничего не выводим, чтобы не загружать оперативную память, может привести к crash`у
     }
     else if ( // проверка на совпадение расширения с нашим шаблоном
-        RtlEqualUnicodeString(
-        &required_extension,
-        //&global_required_extension,
-           // &global_UNICODE_STRING,
-        &NameInfo->Extension, FALSE)
-        || // проверка на совпадение расширения с нашим шаблоном
-        RtlEqualUnicodeString( &((UNICODE_STRING)RTL_CONSTANT_STRING(L"siplatov")), &NameInfo->Extension, FALSE)
+        //RtlEqualUnicodeString(
+        //&required_extension,
+        ////&global_required_extension,
+        //   // &global_UNICODE_STRING,
+        //&NameInfo->Extension, FALSE)
+        //|| // проверка на совпадение расширения с нашим шаблоном
+        //RtlEqualUnicodeString( &((UNICODE_STRING)RTL_CONSTANT_STRING(L"siplatov")), &NameInfo->Extension, FALSE)
 
         //пробуем 
-         //(global_file_extensions_flag != 0) /* && wcscmp(buf_ext, global_file_extensions) == 0)*/
+         (global_file_extensions_flag != 0) && (NameInfo->Extension.Length>5)
         //((global_file_extensions_flag != 0) && ((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions) != NULL) == 1)
         ) 
          {
-        wchar_t buf_ext[64];
+
+        /*wchar_t buf_ext[64];
         memset(buf_ext, 0, sizeof(buf_ext));
-        memcpy(buf_ext, NameInfo->Extension.Buffer, NameInfo->Extension.Length);
-        if(/*wcscmp(buf_ext, global_file_extensions)*/0 == 0)
+        memcpy(buf_ext, NameInfo->Extension.Buffer, NameInfo->Extension.Length);*/
+
+
+        wchar_t buf_file_ext[64];
+        memset(buf_file_ext, 0, sizeof(buf_file_ext));
+        memcpy(buf_file_ext, NameInfo->Extension.Buffer, NameInfo->Extension.Length);
+        //wcscat(buf_file_ext, L" ");
+
+        if((wchar_t)wcsstr(global_file_extensions, buf_file_ext) != NULL)
+            /*wcscmp(buf_ext, global_file_extensions)*/
+            //0 == 0)
          {
-            DbgPrint("1.1.1---------------------------------------------------------------------------------------------------------------------------------"); 
+            DbgPrint("begin---------------------------------------------------------------------------------------------------------------------------------");
+
+
+            //wchar_t buf_for_one = NameInfo->Extension.Buffer;
+
+            //DbgPrint("result: \"%ls\"\n", wcscat(buf_for_one, L" "));
+
+            //DbgPrint("1.0--without spaces");
+            //DbgPrint("Length global_file_extensions is %i\n", wcslen(global_file_extensions));
+            //DbgPrint("global_file_extensions: \"%ls\"\n", global_file_extensions);
+            //wchar_t isNameMatch_w0 = wcsstr(global_file_extensions, buf_file_ext); //
+            ////DbgPrint("buf2"); 
+            //if (isNameMatch_w0 != NULL) //always true
+            //{
+            //    DbgPrint("TRUE");
+
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+            //DbgPrint(isNameMatch_w0);//0
+            //DbgPrint("result: \"%ls\"\n", isNameMatch_w0);
+
+            DbgPrint("1.1.1");
             /*UNICODE_STRING us;
             RtlInitString(&us, global_file_extensions);*/
 
