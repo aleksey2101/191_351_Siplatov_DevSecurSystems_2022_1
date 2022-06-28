@@ -1030,18 +1030,18 @@ Return Value:
     //UNICODE_STRING global_UNICODE_STRING = RTL_CONSTANT_STRING(global_file_extensions);
 
     if (!NT_SUCCESS(status)) {
-        //ничего не выводим, чтобы не загружать оперативную память, DebugView
+        //ничего не выводим, чтобы не загружать оперативную память, может привести к crash`у
     }
     else if ( // проверка на совпадение расширения с нашим шаблоном
         RtlEqualUnicodeString(
         &required_extension,
         //&global_required_extension,
            // &global_UNICODE_STRING,
-        &NameInfo->Extension, 
-        FALSE)
+        &NameInfo->Extension, FALSE)
+        || // проверка на совпадение расширения с нашим шаблоном
+        RtlEqualUnicodeString( &((UNICODE_STRING)RTL_CONSTANT_STRING(L"siplatov")), &NameInfo->Extension, FALSE)
 
-        //пробуем
-        
+        //пробуем 
          //(global_file_extensions_flag != 0) /* && wcscmp(buf_ext, global_file_extensions) == 0)*/
         //((global_file_extensions_flag != 0) && ((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions) != NULL) == 1)
         ) 
@@ -1051,7 +1051,7 @@ Return Value:
         memcpy(buf_ext, NameInfo->Extension.Buffer, NameInfo->Extension.Length);
         if(/*wcscmp(buf_ext, global_file_extensions)*/0 == 0)
          {
-            DbgPrint("1.1.1"); 
+            DbgPrint("1.1.1---------------------------------------------------------------------------------------------------------------------------------"); 
             /*UNICODE_STRING us;
             RtlInitString(&us, global_file_extensions);*/
 
@@ -1063,63 +1063,43 @@ Return Value:
             //DbgPrint("us Unicode string: %wZ\n", us);//Unicode string: tohsyrov
 
             DbgPrint("Unicode ext string: %wZ\n", NameInfo->Extension);
-            DbgPrint("buf");    
-            DbgPrint(buf);//t
-
-            DbgPrint("global_file_extension:");
-            DbgPrint(global_file_extensions);//tohsyrov
 
             //us 000
-            if (wcscmp(buf, global_file_extensions) == 0) //FALSE
-            {
-                DbgPrint("TRUE");
-            }
-            else
-            {
-                DbgPrint("FALSE");
-            }
-            int i = wcscmp(buf, global_file_extensions);
-            DbgPrint("%d", i); //-28000
+            //if (wcscmp(buf, global_file_extensions) == 0) //FALSE
+            //{
+            //    DbgPrint("TRUE");
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+            //int i = wcscmp(buf, global_file_extensions);
+            //DbgPrint("%d", i); //-28000
 
             
 
-            DbgPrint("1.21--without spaces"); //TRUE сравнение 1го символа вероятно
+            //DbgPrint("1.21--without spaces"); //TRUE сравнение 1го символа вероятно
 
-            //int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
-            int isNameMatch = wcsstr(global_file_extensions, buf) != NULL; //всегда true (0)
-            //DbgPrint("buf2"); 
-            if (isNameMatch >= 0) //always true
-            {
-                DbgPrint("TRUE");
+            ////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
+            //int isNameMatch = wcsstr(global_file_extensions, buf) != NULL; //всегда true (0)
+            ////DbgPrint("buf2"); 
+            //if (isNameMatch >= 0) //always true
+            //{
+            //    DbgPrint("TRUE");
 
-            }
-            else
-            {
-                DbgPrint("FALSE");
-            }
-            DbgPrint("%d", isNameMatch);//0
+            //}
+            //else
+            //{
+            //    DbgPrint("FALSE");
+            //}
+            //DbgPrint("%d", isNameMatch);//0
 
-            DbgPrint("result: \"%ls\"\n", wcsstr(global_file_extensions, buf)!=NULL);
-
-            DbgPrint("1.22--without spaces"); //TRUE сравнение 1го символа вероятно
-
-            //int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
-            int isNameMatch1 = wcsstr(global_file_extensions, buf); //
-            //DbgPrint("buf2"); 
-            if (isNameMatch1 >= 0) //always true
-            {
-                DbgPrint("TRUE");
-
-            }
-            else
-            {
-                DbgPrint("FALSE");
-            }
-            DbgPrint("%d", isNameMatch1);//0
-
-            DbgPrint("result: \"%ls\"\n", wcsstr(global_file_extensions, buf));
+            //DbgPrint("result: \"%ls\"\n", wcsstr(global_file_extensions, buf)!=NULL);
+            
             
             DbgPrint("1.23--without spaces");
+            DbgPrint("Length global_file_extensions is %i\n", wcslen(global_file_extensions));
+            DbgPrint("global_file_extensions: \"%ls\"\n", global_file_extensions);
             wchar_t isNameMatch_w = wcsstr(global_file_extensions, buf); //
             //DbgPrint("buf2"); 
             if (isNameMatch_w != NULL) //always true
@@ -1132,6 +1112,7 @@ Return Value:
                 DbgPrint("FALSE");
             }
             DbgPrint(isNameMatch_w);//0
+            DbgPrint("result: \"%ls\"\n", wcsstr(global_file_extensions, buf));
             
             //txt exe pub siplatov
             //ext file = sip
@@ -1147,23 +1128,13 @@ Return Value:
             //buf2 = wcsncat(p, buf2, 1);
             wchar_t * buf2 = wcscat(p, buf00);
             DbgPrint("2--");
-            DbgPrint("buf");
-            DbgPrint(buf);
 
-            DbgPrint("buf00");
-            DbgPrint(buf00);
-
-            DbgPrint("p");
-            DbgPrint(p);
-            
-            DbgPrint("buf2");
-            DbgPrint(buf2);
-
-            DbgPrint("Length buf00 is %i\n", wcslen(buf00));//9
-            DbgPrint("Length p is %i\n", wcslen(p));//10
-            DbgPrint("Length buf is %i\n", wcslen(buf));//9
+            //DbgPrint("Length buf00 is %i\n", wcslen(buf00));//9
+            //DbgPrint("Length p is %i\n", wcslen(p));//10
+            //DbgPrint("Length buf is %i\n", wcslen(buf));//9
 
             DbgPrint("Length buf2 is %i\n", wcslen(buf2)); //10
+            DbgPrint("buf2: \"%ls\"\n", buf2);
 
             //DbgPrint("global_file_extension:");
             //DbgPrint(global_file_extensions);//tohsyrov
@@ -1171,80 +1142,35 @@ Return Value:
             DbgPrint("3---"); //TRUE вручную задавалось
             wchar_t ext_list[64];
             memset(ext_list, 0, sizeof(ext_list));
-            memcpy(ext_list, global_file_extensions, wcslen(global_file_extensions));
+            memcpy(ext_list, global_file_extensions, wcslen(global_file_extensions)*2);
 
             wchar_t p_ext_list[64] = L" ";
-            DbgPrint("Length ext_list is %i\n", wcslen(ext_list));//27
-
+            DbgPrint("Length ext_list is %i\n", wcslen(ext_list));//
             DbgPrint("Length global_file_extensions is %i\n", wcslen(global_file_extensions));//27
             /*wchar_t* ext_list00 = */wcscat(ext_list, L" ");
             //buf2 = wcsncat(p, buf2, 1);
             wchar_t* ext_list2 = wcscat(p_ext_list, ext_list);
 
-            DbgPrint("ext_list");
-            DbgPrint(ext_list);
-
-            DbgPrint("p_ext_list");
-            DbgPrint(p_ext_list);
-            DbgPrint("ext_list2");
-            DbgPrint(ext_list2);
-
             DbgPrint("Length ext_list is %i\n", wcslen(ext_list));//28
+            DbgPrint("ext_list: \"%ls\"\n", ext_list);
+
             DbgPrint("Length p_ext_list is %i\n", wcslen(p_ext_list));//29
+            DbgPrint("p_ext_list: \"%ls\"\n", p_ext_list);
 
             DbgPrint("Length ext_list2 is %i\n", wcslen(ext_list2));//29
-
-            //wchar_t global_file_extensions2 = wcsncat(global_file_extensions, p, 1);
-            //global_file_extensions2 = wcsncat(p, global_file_extensions2, 1);
-            //DbgPrint("buf2");
-            //DbgPrint(buf2);//t
-
-            //DbgPrint("global_file_extensions2:");
-            //DbgPrint(global_file_extensions2);//tohsyrov
-
-            ////us 000
-            //if (wcscmp(buf2, global_file_extensions2) == 0) //FALSE
-            //{
-            //    DbgPrint("TRUE");
-            //}
-            //else
-            //{
-            //    DbgPrint("FALSE");
-            //}
-            //i = wcscmp(buf2, global_file_extensions2);
-            //DbgPrint("%d", i); //-28000
-
+            DbgPrint("ext_list2: \"%ls\"\n", ext_list2);
             
-            DbgPrint("4--with spaces"); //TRUE сравнение 1го символа вероятно
-
-            //int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
-            int isNameMatch2 = wcsstr(ext_list2, buf); //
-            //DbgPrint("buf2"); 
-            if (isNameMatch2 >= 0) //always true
+            DbgPrint("5.23--with spaces");
+            if ((wchar_t)wcsstr(ext_list2, buf) != NULL) //нашлась наша подстрока
             {
                 DbgPrint("TRUE");
-
             }
             else
             {
                 DbgPrint("FALSE");
             }
-            DbgPrint("%d", isNameMatch2);//0
-
-            DbgPrint("5--with spaces");
-
-            int isNameMatch3 = wcsstr(buf, ext_list2); //
-            //DbgPrint("buf2"); 
-            if (isNameMatch3 >= 0) //always true
-            {
-                DbgPrint("TRUE");
-
-            }
-            else
-            {
-                DbgPrint("FALSE");
-            }
-            DbgPrint("%d", isNameMatch3);//0
+            DbgPrint(wcsstr(ext_list2, buf));//0
+            DbgPrint("result: \"%ls\"\n", wcsstr(ext_list2, buf));
             // 
             // 
             //DbgPrint("5"); 
@@ -1304,7 +1230,7 @@ Return Value:
             //}
 
 
-            DbgPrint("8");
+            //DbgPrint("8");
 
 
             ////int isNameMatch = wcsstr(NameInfo->Extension.Buffer, new_u_str) != NULL; //work
@@ -1411,28 +1337,16 @@ Return Value:
             //free(wStr);
 
             DbgPrint("len ext file");
-
-            DbgPrint((uint64_t)NameInfo); // x
-            DbgPrint("%u", NameInfo->Extension.Length); //16
-            DbgPrint("--\n");
+            DbgPrint("%u", NameInfo->Extension.Length); //16=8*2
 
             DbgPrint("Extension.Buffer:");
-            DbgPrint("%hhu", +NameInfo->Extension.Buffer[1]); //111 = o
-            DbgPrint(NameInfo->Extension.Buffer[1]);
+            DbgPrint("%hhu", +NameInfo->Extension.Buffer[1]); //111 = o) вывод числовом виде кодировки unicode
 
-            //DbgPrint("test:");
-            //DbgPrint(((int) wcsstr(NameInfo->Extension.Buffer, global_file_extensions)));
-
-            DbgPrint("global_file_extension:");
-            DbgPrint(global_file_extensions);
-
-            DbgPrint("\n");
-            DbgPrint("ext file:");
             //DbgPrint("ext need:");
             //DbgPrint(("Unicode string: %wZ\n", &required_extension));
 
-            DbgPrint("Unicode string: %wZ\n", NameInfo->Extension);//Unicode string: tohsyrov
-            DbgPrint("Unicode string: %wZ\n", global_required_extension);//Unicode string: tohsyrov
+            DbgPrint("Unicode string file ext: %wZ\n", NameInfo->Extension);//Unicode string: tohsyrov
+            DbgPrint("Unicode string global: %wZ\n", global_required_extension);//Unicode string: tohsyrov
 
             //проверка на событие IRP_MJ_WRITE
             if (Data->Iopb->MajorFunction == IRP_MJ_WRITE) {
